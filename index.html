@@ -159,7 +159,7 @@
 
                     new TradingView.widget({
                         "autosize": true,
-                        "symbol": `KRX:${top.code.split('.')[0]}`,
+                        "symbol": `KRX:${top.code.replace('.KS', '')}`,
                         "interval": "D",
                         "timezone": "Asia/Seoul",
                         "theme": "dark",
