@@ -182,7 +182,8 @@
 
         function renderTradingViewChart(code) {
             if (!code) return;
-            var cleanCode = code.replace('.KS', '').replace('KRX:', '');
+            
+            var cleanCode = code.replace('.KS', '').replace('KRX:', '').trim();
             var container = document.getElementById('tradingview_chart');
             container.innerHTML = ''; 
 
@@ -195,7 +196,6 @@
                     "theme": "dark",
                     "style": "1",
                     "locale": "kr",
-                    "toolbar_bg": "#f1f3f6",
                     "enable_publishing": false,
                     "allow_symbol_change": true,
                     "container_id": "tradingview_chart"
