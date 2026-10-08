@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Quant Hub - 매매 타점 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen">
+
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-black text-lg">Q</div>
+                <h1 class="text-base font-bold tracking-tight">AI QUANT HUB</h1>
+            </div>
+
+            <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1">
+                <button id="btn-simple" onclick="setMode('simple')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition">
+                    ✨ 간편 모드
+                </button>
+                <button id="btn-pro" onclick="setMode('pro')" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition">
+                    📊 전문가(Pro) 모드
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="pro-market-bar" class="hidden bg-slate-900/80 border-b border-slate-800 text-xs py-2 px-4 overflow-x-auto whitespace-nowrap">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-6 text-slate-400">
+            <div class="flex items-center gap-4">
+                <span class="bg-indigo-500/20 text-indigo-400 font-bold px-2 py-0.5 rounded text-[10px]">PRO MACRO</span>
+                <div>시장 상태: <span id="market-status" class="font-bold text-emerald-400">로딩 중...</span></div>
+            </div>
+            <div>알고리즘 적중률(승률): <span class="text-emerald-400 font-bold">56.0%</span> | 손익비: <span class="text-emerald-400 font-bold">2.40</span></div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+        <section class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 p-6 rounded-2xl border border-indigo-500/30 shadow-2xl">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                <div class="lg:col-span-2 space-y-3">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-emerald-500 text-slate-950 text-xs font-black px-2.5 py-0.5 rounded-full">TODAY'S AI TOP PICK</span>
+                        <span class="text-slate-400 text-xs">5팩터 다층 알고리즘 검증 완료</span>
+                    </div>
+                    <h2 class="text-3xl font-black tracking-tight" id="top-name">
+                        로딩 중...
+                    </h2>
+                    <p class="text-emerald-400 text-sm font-semibold">
+                        💡 "상승 추세 유지 + 변동성 상단 돌파 & 거래량 수수급 유입 포착"
+                    </p>
+                </div>
+
+                <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 text-center space-y-3">
+                    <div>
+                        <div class="text-xs text-slate-400 font-medium">AI 승률 스코어</div>
+                        <div class="text-5xl font-black text-emerald-400 mt-1" id="top-score">0 <span class="text-sm text-slate-500 font-normal">/ 100점</span></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800">
+                        <div class="bg-slate-950 p-2 rounded-lg">
+                            <div class="text-[10px] text-slate-400">진입가</div>
+                            <div class="text-xs font-bold text-white mt-0.5" id="top-price">-</div>
+                        </div>
+                        <div class="bg-slate-950 p-2 rounded-lg">
+                            <div class="text-[10px] text-emerald-400">목표가 (+8%)</div>
+                            <div class="text-xs font-bold text-emerald-400 mt-0.5" id="top-target">-</div>
+                        </div>
+                        <div class="bg-slate-950 p-2 rounded-lg">
+                            <div class="text-[10px] text-rose-400">손절가 (ATR)</div>
+                            <div class="text-xs font-bold text-rose-400 mt-0.5" id="top-stop">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="pro-details" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-slate-900 p-4 rounded-2xl border border-slate-800 h-[400px]">
+                <div class="text-xs font-bold text-slate-300 mb-2">📊 TradingView 실시간 차트</div>
+                <div id="tradingview_chart" class="w-full h-[350px] rounded-lg overflow-hidden"></div>
+            </div>
+            
+            <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 text-xs">
+                <h3 class="font-bold text-slate-200 border-b border-slate-800 pb-2">🎯 AI 가중치 분석</h3>
+                <div class="space-y-2">
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">추세 정배열 (EMA/MA) <span>30 / 30점</span></div>
+                        <div class="bg-slate-800 h-1.5 rounded-full overflow-hidden"><div class="bg-indigo-500 h-full w-full"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">변동성 상단 돌파 <span>25 / 25점</span></div>
+                        <div class="bg-slate-800 h-1.5 rounded-full overflow-hidden"><div class="bg-emerald-500 h-full w-full"></div></div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-slate-400 mb-1">거래량 150% 수급 <span>20 / 20점</span></div>
+                        <div class="bg-slate-800 h-1.5 rounded-full overflow-hidden"><div class="bg-sky-500 h-full w-full"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-slate-900 p-5 rounded-2xl border border-slate-800">
+            <h3 class="font-bold text-sm text-slate-200 mb-4">🔥 실시간 AI 종목 스크리닝 랭킹</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
+                        <tr>
+                            <th class="p-3">종목명</th>
+                            <th class="p-3">현재가</th>
+                            <th class="p-3">AI 점수</th>
+                            <th class="p-3">매수 시그널</th>
+                            <th class="p-3">목표가</th>
+                            <th class="p-3">손절가</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body" class="divide-y divide-slate-800/60">
+                        <tr><td colspan="6" class="p-4 text-center text-slate-500">데이터를 불러오는 중입니다...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const API_URL = "https://my-quant-ai.onrender.com/api/signals";
+
+        async function fetchSignals() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                
+                document.getElementById('market-status').innerText = data.market_bull ? "상승장 (Bull Market)" : "하락장 (Caution)";
+                
+                const signals = data.signals;
+                if(signals.length > 0) {
+                    const top = signals[0];
+                    document.getElementById('top-name').innerText = `${top.name} (${top.code})`;
+                    document.getElementById('top-score').innerText = top.score;
+                    document.getElementById('top-price').innerText = `${top.price.toLocaleString()}원`;
+                    document.getElementById('top-target').innerText = `${top.target_price.toLocaleString()}원`;
+                    document.getElementById('top-stop').innerText = `${top.stop_price.toLocaleString()}원`;
+
+                    const tbody = document.getElementById('table-body');
+                    tbody.innerHTML = signals.map((item, idx) => `
+                        <tr class="${idx === 0 ? 'bg-emerald-500/10 font-bold border-l-4 border-emerald-500' : 'hover:bg-slate-800/40'}">
+                            <td class="p-3 text-white">${item.name} (${item.code})</td>
+                            <td class="p-3">${item.price.toLocaleString()}원</td>
+                            <td class="p-3 text-emerald-400">${item.score}점</td>
+                            <td class="p-3"><span class="${item.signal === 'BUY' ? 'bg-emerald-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'} px-2 py-0.5 rounded">${item.signal}</span></td>
+                            <td class="p-3 text-emerald-400">${item.target_price.toLocaleString()}원</td>
+                            <td class="p-3 text-rose-400">${item.stop_price.toLocaleString()}원</td>
+                        </tr>
+                    `).join('');
+
+                    new TradingView.widget({
+                        "autosize": true,
+                        "symbol": `KRX:${top.code.split('.')[0]}`,
+                        "interval": "D",
+                        "timezone": "Asia/Seoul",
+                        "theme": "dark",
+                        "style": "1",
+                        "locale": "kr",
+                        "container_id": "tradingview_chart"
+                    });
+                }
+            } catch (err) {
+                console.error("API 연결 실패:", err);
+            }
+        }
+
+        function setMode(mode) {
+            const btnSimple = document.getElementById('btn-simple');
+            const btnPro = document.getElementById('btn-pro');
+            const proBar = document.getElementById('pro-market-bar');
+            const proDetails = document.getElementById('pro-details');
+
+            if (mode === 'pro') {
+                btnPro.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition";
+                btnSimple.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition";
+                proBar.classList.remove('hidden');
+                proDetails.classList.remove('hidden');
+            } else {
+                btnSimple.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition";
+                btnPro.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition";
+                proBar.classList.add('hidden');
+                proDetails.classList.add('hidden');
+            }
+        }
+
+        fetchSignals();
+    </script>
+</body>
+</html>
