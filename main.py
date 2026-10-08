@@ -50,12 +50,24 @@ def calculate_stock_score(df, market_bull):
     target_price = int(curr_price * 1.08)
     stop_price = int(curr_price * 0.95)
     
+    # 캔들스틱 차트용 OHLC 데이터 파싱
+    ohlc_data = []
+    for date, row in df.tail(30).iterrows():
+        ohlc_data.append({
+            "time": date.strftime("%Y-%m-%d"),
+            "open": int(row['Open']),
+            "high": int(row['High']),
+            "low": int(row['Low']),
+            "close": int(row['Close'])
+        })
+
     return {
         "price": curr_price,
         "score": score,
         "signal": signal,
         "target_price": target_price,
-        "stop_price": stop_price
+        "stop_price": stop_price,
+        "ohlc": ohlc_data
     }
 
 @app.get("/")
