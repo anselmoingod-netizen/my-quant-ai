@@ -31,25 +31,22 @@ class PortfolioItem(BaseModel):
     quantity: int
 
 def calculate_stock_score(df, market_bull):
-    if df.empty or len(df) < 20:
+    if df is None or df.empty or len(df) < 5:
         return None
         
     curr_price = int(df['Close'].iloc[-1])
-    ma5 = df['Close'].rolling(5).mean().iloc[-1]
-    ma20 = df['Close'].rolling(20).mean().iloc[-1]
-    vol_ma5 = df['Volume'].rolling(5).mean().iloc[-1]
+    ma5 = df['Close'].rolling(5).mean().iloc[-1] if len(df) >= 5 else curr_price
+    ma20 = df['Close'].rolling(20).mean().iloc[-1] if len(df) >= 20 else ma5
+    vol_ma5 = df['Volume'].rolling(5).mean().iloc[-1] if len(df) >= 5 else 1
     curr_vol = df['Volume'].iloc[-1]
-    std20 = df['Close'].rolling(20).std().iloc[-1]
-    upper_band = ma20 + (std20 * 2)
     
     score = 0
     if ma5 > ma20: score += 30
-    if curr_price > upper_band: score += 25
-    if curr_vol > vol_ma5 * 1.5: score += 20
+    if curr_vol > vol_ma5 * 1.2: score += 20
     if market_bull: score += 15
-    if curr_price > ma5: score += 10
+    if curr_price > ma5: score += 15
     
-    signal = "BUY" if score >= 80 else "HOLD"
+    signal = "BUY" if score >= 60 else "HOLD"
     target_price = int(curr_price * 1.08)
     stop_price = int(curr_price * 0.95)
     
@@ -71,22 +68,21 @@ def get_signals():
     market_bull = True
     try:
         kospi = yf.Ticker("^KS11").history(period="1mo")
-        if not kospi.empty and len(kospi) >= 20:
+        if not kospi.empty and len(kospi) >= 5:
             ma20 = kospi['Close'].rolling(20).mean().iloc[-1]
             market_bull = bool(kospi['Close'].iloc[-1] > ma20)
-    except Exception as e:
-        print(f"Kospi fetch error: {e}")
+    except Exception:
+        pass
 
     for name, code in TICKERS.items():
         try:
             stock = yf.Ticker(code)
-            df = stock.history(period="3mo")
+            df = stock.history(period="1mo")
             res = calculate_stock_score(df, market_bull)
             if res:
                 res.update({"name": name, "code": code})
                 results.append(res)
-        except Exception as e:
-            print(f"Error fetching {name}: {e}")
+        except Exception:
             continue
 
     results.sort(key=lambda x: x['score'], reverse=True)
@@ -95,23 +91,17 @@ def get_signals():
 @app.post("/api/analyze-portfolio")
 def analyze_portfolio(items: List[PortfolioItem]):
     market_bull = True
-    try:
-        kospi = yf.Ticker("^KS11").history(period="1mo")
-        if not kospi.empty and len(kospi) >= 20:
-            ma20 = kospi['Close'].rolling(20).mean().iloc[-1]
-            market_bull = bool(kospi['Close'].iloc[-1] > ma20)
-    except Exception as e:
-        pass
-
     diagnostics = []
     total_eval = 0
     total_buy = 0
 
     for item in items:
         try:
-            code = item.code if item.code.endswith('.KS') or item.code.endswith('.KQ') else f"{item.code}.KS"
+            raw_code = item.code.strip().upper()
+            code = raw_code if ('.KS' in raw_code or '.KQ' in raw_code) else f"{raw_code}.KS"
+            
             stock = yf.Ticker(code)
-            df = stock.history(period="3mo")
+            df = stock.history(period="1mo")
             res = calculate_stock_score(df, market_bull)
             
             if res:
@@ -126,15 +116,14 @@ def analyze_portfolio(items: List[PortfolioItem]):
                 total_eval += eval_amount
                 total_buy += buy_amount
 
-                # 진단 액션 매핑
-                if res["score"] >= 80:
-                    action = "✨ 추가 매수(불타기) 적기"
+                if res["score"] >= 70:
+                    action = "✨ 추가 매수(불타기) 고려"
                 elif curr_price <= res["stop_price"]:
-                    action = "🚨 손절가 하향 이탈 (리스크 관리 필요)"
+                    action = "🚨 손절가 하향 이탈"
                 elif curr_price >= res["target_price"]:
-                    action = "🎯 목표가 도달 (수익 실현 고려)"
+                    action = "🎯 목표가 도달 (익절)"
                 else:
-                    action = "⏳ 관망 및 보유 (HOLD)"
+                    action = "⏳ 보유 (HOLD)"
 
                 diagnostics.append({
                     "code": code,
@@ -145,8 +134,8 @@ def analyze_portfolio(items: List[PortfolioItem]):
                     "score": res["score"],
                     "action": action
                 })
-        except Exception as e:
-            print(f"Portfolio error ({item.code}): {e}")
+        except Exception:
+            continue
 
     total_profit_rate = round(((total_eval - total_buy) / total_buy) * 100, 2) if total_buy > 0 else 0
 
