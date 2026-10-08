@@ -84,7 +84,16 @@
             <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 bg-slate-900 p-4 rounded-2xl border border-slate-800 h-[420px] flex flex-col">
                     <div class="flex justify-between items-center mb-2">
-                        <div class="text-xs font-bold text-slate-300">📊 AI 퀀트 실시간 차트 (나무증권 Open API 연동)</div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold text-slate-300">📊 실시간 차트</span>
+                            <!-- 타임프레임 멀티 셀렉터 (MTS 스타일) -->
+                            <div class="flex items-center bg-slate-950 border border-slate-800 p-0.5 rounded text-[10px] font-bold">
+                                <button onclick="changeTimeframe('1m')" id="tf-1m" class="px-2 py-0.5 rounded text-slate-400 hover:text-white">1분</button>
+                                <button onclick="changeTimeframe('5m')" id="tf-5m" class="px-2 py-0.5 rounded text-slate-400 hover:text-white">5분</button>
+                                <button onclick="changeTimeframe('15m')" id="tf-15m" class="px-2 py-0.5 rounded text-slate-400 hover:text-white">15분</button>
+                                <button onclick="changeTimeframe('1d')" id="tf-1d" class="px-2 py-0.5 rounded bg-indigo-600 text-white">일봉</button>
+                            </div>
+                        </div>
                         <div id="selected-stock-title" class="text-xs font-bold text-indigo-400">종목을 선택하세요</div>
                     </div>
                     <div class="w-full flex-1 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 p-2 flex items-center justify-center relative">
@@ -204,10 +213,12 @@
 
     <script>
         var API_SIGNALS = "https://my-quant-ai.onrender.com/api/signals";
+        var API_CHART = "https://my-quant-ai.onrender.com/api/chart-data";
         var API_PF = "https://my-quant-ai.onrender.com/api/analyze-portfolio";
 
         var globalSignals = [];
         var activeStock = null;
+        var currentTimeframe = '1d';
         var currentFilter = 'ALL';
         var myPortfolio = JSON.parse(localStorage.getItem('my_portfolio') || '[]');
 
@@ -226,8 +237,26 @@
             if (tab === 'pf') analyzePortfolio();
         }
 
-        // 나무증권 시세 데이터 렌더링 함수
-        function drawCanvasChart(stock) {
+        function changeTimeframe(tf) {
+            currentTimeframe = tf;
+            ['1m', '5m', '15m', '1d'].forEach(function(t) {
+                var btn = document.getElementById('tf-' + t);
+                if (btn) {
+                    btn.className = t === tf ? "px-2 py-0.5 rounded bg-indigo-600 text-white" : "px-2 py-0.5 rounded text-slate-400 hover:text-white";
+                }
+            });
+            if (activeStock) fetchAndRenderChart(activeStock.code, currentTimeframe);
+        }
+
+        function fetchAndRenderChart(code, tf) {
+            fetch(API_CHART + "?code=" + code + "&timeframe=" + tf)
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    drawCanvasChart(data.ohlc);
+                });
+        }
+
+        function drawCanvasChart(ohlc) {
             var canvas = document.getElementById('stockCanvas');
             if (!canvas) return;
             var ctx = canvas.getContext('2d');
@@ -240,16 +269,15 @@
 
             ctx.clearRect(0, 0, w, h);
 
-            if (!stock || !stock.ohlc || stock.ohlc.length === 0) {
+            if (!ohlc || ohlc.length === 0) {
                 ctx.fillStyle = '#64748b';
                 ctx.font = '12px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('차트 데이터 수신 중...', w / 2, h / 2);
+                ctx.fillText('차트 데이터 로딩 중...', w / 2, h / 2);
                 return;
             }
 
-            var data = stock.ohlc;
-            var prices = data.map(function(d) { return d.close; });
+            var prices = ohlc.map(function(d) { return d.close; });
             var minP = Math.min.apply(null, prices) * 0.98;
             var maxP = Math.max.apply(null, prices) * 1.02;
 
@@ -263,12 +291,12 @@
                 ctx.stroke();
             }
 
-            var candleW = (w - 40) / data.length;
+            var candleW = (w - 40) / ohlc.length;
             ctx.beginPath();
             ctx.strokeStyle = '#10b981';
             ctx.lineWidth = 2;
 
-            data.forEach(function(d, idx) {
+            ohlc.forEach(function(d, idx) {
                 var x = 20 + idx * candleW + candleW / 2;
                 var y = h - ((d.close - minP) / (maxP - minP)) * (h - 40) - 20;
 
@@ -304,7 +332,7 @@
             var item = globalSignals.find(function(s) { return s.code === code; });
             if (!item) return;
             activeStock = item;
-            drawCanvasChart(item);
+            fetchAndRenderChart(item.code, currentTimeframe);
             updateWeightAnalysis(item);
         }
 
@@ -360,7 +388,7 @@
                         document.getElementById('top-target').innerText = top.target_price.toLocaleString() + "원";
                         document.getElementById('top-stop').innerText = top.stop_price.toLocaleString() + "원";
                         renderTable(globalSignals);
-                        drawCanvasChart(top);
+                        fetchAndRenderChart(top.code, currentTimeframe);
                         updateWeightAnalysis(top);
                     }
                 });
@@ -432,7 +460,7 @@
         }
 
         window.addEventListener('resize', function() {
-            if (activeStock) drawCanvasChart(activeStock);
+            if (activeStock) fetchAndRenderChart(activeStock.code, currentTimeframe);
         });
 
         loadSignals();
