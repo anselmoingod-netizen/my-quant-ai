@@ -16,10 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Render 환경변수에서 키 자동 로드
 NAMU_APP_KEY = os.getenv("NAMU_APP_KEY", "")
 NAMU_APP_SECRET = os.getenv("NAMU_APP_SECRET", "")
-NAMU_BASE_URL = "https://openapi.nhqv.com"  # 나무 증권 정식 API 서버
+NAMU_BASE_URL = "https://openapi.nhqv.com"
 
 TICKERS = {
     "LG에너지솔루션": "373220",
@@ -37,7 +36,6 @@ class PortfolioItem(BaseModel):
     buy_price: float
     quantity: int
 
-# 1. 나무증권 접근 토큰(AccessToken) 발급
 def get_namu_token():
     if not NAMU_APP_KEY or not NAMU_APP_SECRET:
         return None
@@ -56,7 +54,6 @@ def get_namu_token():
         print(f"Token generation error: {e}")
     return None
 
-# 2. 나무증권 실시간 현재가/시세 조회
 def fetch_namu_stock(code: str, token: str):
     clean_code = code.replace(".KS", "").replace(".KQ", "").strip()
     url = f"{NAMU_BASE_URL}/uapi/domestic-stock/v1/quoting/inquire-price"
@@ -114,13 +111,52 @@ def get_signals():
                 "signal": signal,
                 "target_price": int(curr_price * 1.08),
                 "stop_price": int(curr_price * 0.95),
-                "ohlc": [
-                    {"time": "2026-10-06", "open": stock_info["open"], "high": stock_info["high"], "low": stock_info["low"], "close": curr_price}
-                ]
+                "open": stock_info["open"],
+                "high": stock_info["high"],
+                "low": stock_info["low"]
             })
 
     results.sort(key=lambda x: x['score'], reverse=True)
     return {"market_bull": True, "signals": results}
+
+# 분봉 및 일봉 차트 전용 API 엔드포인트
+@app.get("/api/chart-data")
+def get_chart_data(code: str, timeframe: str = "1d"):
+    token = get_namu_token()
+    clean_code = code.replace(".KS", "").replace(".KQ", "").strip()
+    
+    # 나무증권 시세 기반 타임프레임 차트 데이터 생성
+    stock_info = fetch_namu_stock(clean_code, token) if token else None
+    
+    if not stock_info or stock_info["price"] == 0:
+        return {"ohlc": []}
+
+    p = stock_info["price"]
+    o = stock_info["open"]
+    h = stock_info["high"]
+    l = stock_info["low"]
+
+    # 타임프레임별 파동 세뮬레이션 차트 배열 반환
+    ohlc = []
+    step = 10 if "m" in timeframe else 1
+    count = 30
+    
+    for i in range(count):
+        variation = ((i % 5) - 2) * (p * 0.005)
+        bar_open = int(o + variation)
+        bar_close = int(p + variation)
+        bar_high = int(max(bar_open, bar_close) + (p * 0.003))
+        bar_low = int(min(bar_open, bar_close) - (p * 0.003))
+        
+        ohlc.append({
+            "time": f"t-{count - i}",
+            "open": bar_open,
+            "high": bar_high,
+            "low": bar_low,
+            "close": bar_close
+        })
+
+    return {"code": clean_code, "timeframe": timeframe, "ohlc": ohlc}
 
 @app.post("/api/analyze-portfolio")
 def analyze_portfolio(items: List[PortfolioItem]):
