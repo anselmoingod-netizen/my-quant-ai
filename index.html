@@ -34,7 +34,7 @@
         <div class="max-w-7xl mx-auto flex items-center justify-between gap-6 text-slate-400">
             <div class="flex items-center gap-4">
                 <span class="bg-indigo-500/20 text-indigo-400 font-bold px-2 py-0.5 rounded text-[10px]">PRO MACRO</span>
-                <div>시장 상태: <span id="market-status" class="font-bold text-emerald-400">로딩 중...</span></div>
+                <div>시장 상태: <span id="market-status" class="font-bold text-emerald-400">연결 확인 중...</span></div>
             </div>
             <div>알고리즘 적중률(승률): <span class="text-emerald-400 font-bold">56.0%</span> | 손익비: <span class="text-emerald-400 font-bold">2.40</span></div>
         </div>
@@ -42,6 +42,12 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
+
+        <!-- Status Notification Banner -->
+        <div id="status-banner" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-xs text-amber-400 flex justify-between items-center">
+            <span>⚡ 백엔드 무료 서버가 깨어나는 중입니다. (약 20~40초 소요) 잠시만 기다려주세요...</span>
+            <button onclick="fetchSignals()" class="bg-amber-500 text-slate-950 px-2 py-1 rounded font-bold hover:bg-amber-400">수동 새로고침</button>
+        </div>
 
         <!-- Top Pick Section -->
         <section class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 p-6 rounded-2xl border border-indigo-500/30 shadow-2xl">
@@ -52,7 +58,7 @@
                         <span class="text-slate-400 text-xs">5팩터 다층 알고리즘 검증 완료</span>
                     </div>
                     <h2 class="text-3xl font-black tracking-tight" id="top-name">
-                        로딩 중...
+                        서버 연결 중...
                     </h2>
                     <p class="text-emerald-400 text-sm font-semibold">
                         💡 "상승 추세 유지 + 변동성 상단 돌파 & 거래량 수급 유입 포착"
@@ -77,166 +83,3 @@
                         <div class="bg-slate-950 p-2 rounded-lg">
                             <div class="text-[10px] text-rose-400">손절가 (ATR)</div>
                             <div class="text-xs font-bold text-rose-400 mt-0.5" id="top-stop">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Pro Details Section -->
-        <section id="pro-details" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-slate-900 p-4 rounded-2xl border border-slate-800 h-[400px]">
-                <div class="flex justify-between items-center mb-2">
-                    <div class="text-xs font-bold text-slate-300">📊 TradingView 실시간 차트</div>
-                    <div id="selected-stock-title" class="text-xs font-bold text-indigo-400">종목을 선택하세요</div>
-                </div>
-                <div id="tradingview_chart" class="w-full h-[350px] rounded-lg overflow-hidden bg-slate-950 flex items-center justify-center text-slate-600 text-xs">
-                    차트 불러오는 중...
-                </div>
-            </div>
-            
-            <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 text-xs">
-                <h3 class="font-bold text-slate-200 border-b border-slate-800 pb-2 flex justify-between">
-                    <span>🎯 AI 가중치 세부 분석</span>
-                    <span id="weight-stock-name" class="text-indigo-400">-</span>
-                </h3>
-                <div class="space-y-3 pt-1">
-                    <div>
-                        <div class="flex justify-between text-slate-400 mb-1">추세 정배열 (EMA/MA) <span id="w-trend">0 / 30점</span></div>
-                        <div class="bg-slate-800 h-1.5 rounded-full overflow-hidden"><div id="wb-trend" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div></div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-slate-400 mb-1">변동성 상단 돌파 <span id="w-volatility">0 / 25점</span></div>
-                        <div class="bg-slate-800 h-1.5 rounded-full overflow-hidden"><div id="wb-volatility" class="bg-emerald-500 h-full w-0 transition-all duration-500"></div></div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-slate-400 mb-1">거래량 수급 유입 <span id="w-volume">0 / 20점</span></div>
-                        <div class="bg-slate-800 h-1.5 rounded-full overflow-hidden"><div id="wb-volume" class="bg-sky-500 h-full w-0 transition-all duration-500"></div></div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-slate-400 mb-1">KOSPI 상승장 지지 <span id="w-market">0 / 15점</span></div>
-                        <div class="bg-slate-800 h-1.5 rounded-full overflow-hidden"><div id="wb-market" class="bg-amber-500 h-full w-0 transition-all duration-500"></div></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Table Section -->
-        <section class="bg-slate-900 p-5 rounded-2xl border border-slate-800">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-bold text-sm text-slate-200">🔥 실시간 AI 종목 스크리닝 랭킹</h3>
-                <span class="text-[11px] text-slate-500">* 종목 행을 클릭하면 차트 및 세부 분석을 보실 수 있습니다.</span>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
-                        <tr>
-                            <th class="p-3">종목명</th>
-                            <th class="p-3">현재가</th>
-                            <th class="p-3">AI 점수</th>
-                            <th class="p-3">매수 시그널</th>
-                            <th class="p-3">목표가</th>
-                            <th class="p-3">손절가</th>
-                        </tr>
-                    </thead>
-                    <tbody id="table-body" class="divide-y divide-slate-800/60">
-                        <tr><td colspan="6" class="p-4 text-center text-slate-500">데이터를 불러오는 중입니다...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-    </main>
-
-    <script>
-        const API_URL = "https://my-quant-ai.onrender.com/api/signals";
-        let globalSignals = [];
-        let activeStock = null;
-        let isMarketBull = true;
-
-        function renderTradingViewChart(code) {
-            if (!code) return;
-            const cleanCode = code.replace('.KS', '');
-            
-            const container = document.getElementById('tradingview_chart');
-            container.innerHTML = ''; 
-
-            new TradingView.widget({
-                "autosize": true,
-                "symbol": `KRX:${cleanCode}`,
-                "interval": "D",
-                "timezone": "Asia/Seoul",
-                "theme": "dark",
-                "style": "1",
-                "locale": "kr",
-                "container_id": "tradingview_chart"
-            });
-        }
-
-        function updateWeightAnalysis(item) {
-            document.getElementById('weight-stock-name').innerText = `${item.name}`;
-            document.getElementById('selected-stock-title').innerText = `${item.name} (${item.code})`;
-            
-            // 점수 역산식 시각화
-            const trendScore = item.score >= 30 ? 30 : item.score;
-            const volScore = item.score >= 55 ? 25 : (item.score > 30 ? item.score - 30 : 0);
-            const volumeScore = item.score >= 75 ? 20 : (item.score > 55 ? item.score - 55 : 0);
-            const marketScore = isMarketBull ? 15 : 0;
-
-            document.getElementById('w-trend').innerText = `${trendScore} / 30점`;
-            document.getElementById('wb-trend').style.width = `${(trendScore / 30) * 100}%`;
-
-            document.getElementById('w-volatility').innerText = `${volScore} / 25점`;
-            document.getElementById('wb-volatility').style.width = `${(volScore / 25) * 100}%`;
-
-            document.getElementById('w-volume').innerText = `${volumeScore} / 20점`;
-            document.getElementById('wb-volume').style.width = `${(volumeScore / 20) * 100}%`;
-
-            document.getElementById('w-market').innerText = `${marketScore} / 15점`;
-            document.getElementById('wb-market').style.width = `${(marketScore / 15) * 100}%`;
-        }
-
-        function selectStock(code) {
-            const item = globalSignals.find(s => s.code === code);
-            if (!item) return;
-
-            activeStock = item;
-            
-            // 전문가 모드로 전환
-            setMode('pro');
-            
-            // 차트 및 가중치 업데이트
-            renderTradingViewChart(item.code);
-            updateWeightAnalysis(item);
-        }
-
-        async function fetchSignals() {
-            try {
-                const res = await fetch(API_URL);
-                if (!res.ok) throw new Error("API 응답 실패");
-                const data = await res.json();
-                
-                isMarketBull = data.market_bull;
-                document.getElementById('market-status').innerText = isMarketBull ? "상승장 (Bull Market)" : "하락장 (Caution)";
-                
-                globalSignals = data.signals;
-                if(globalSignals && globalSignals.length > 0) {
-                    const top = globalSignals[0];
-                    activeStock = top;
-
-                    document.getElementById('top-name').innerText = `${top.name} (${top.code})`;
-                    document.getElementById('top-score').innerText = top.score;
-                    document.getElementById('top-price').innerText = `${top.price.toLocaleString()}원`;
-                    document.getElementById('top-target').innerText = `${top.target_price.toLocaleString()}원`;
-                    document.getElementById('top-stop').innerText = `${top.stop_price.toLocaleString()}원`;
-
-                    const tbody = document.getElementById('table-body');
-                    tbody.innerHTML = globalSignals.map((item, idx) => `
-                        <tr onclick="selectStock('${item.code}')" class="cursor-pointer transition ${idx === 0 ? 'bg-emerald-500/10 font-bold border-l-4 border-emerald-500 hover:bg-emerald-500/20' : 'hover:bg-slate-800/60'}">
-                            <td class="p-3 text-white flex items-center gap-2">
-                                <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">${idx + 1}</span>
-                                ${item.name} (${item.code})
-                            </td>
-                            <td class="p-3">${item.price.toLocaleString()}원</td>
-                            <td class="p-3 text-emerald-400">${item.score}점</td>
-                            <td class="p-3"><span class="${item.signal === 'BUY' ? 'bg-emerald-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-400'} px-2 py-0.5 rounded">${item.signal}</span>
