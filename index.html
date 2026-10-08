@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Quant Hub - 매매 타점 대시보드</title>
+    <title>AI Quant Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen">
 
-    <!-- Header -->
     <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
@@ -16,7 +15,6 @@
                 <h1 class="text-base font-bold tracking-tight">AI QUANT HUB <span class="text-xs bg-indigo-500/20 text-indigo-400 font-normal px-2 py-0.5 rounded ml-2">PRO</span></h1>
             </div>
 
-            <!-- Tab Switch -->
             <div class="bg-slate-950 p-1 rounded-xl border border-slate-800 flex items-center gap-1">
                 <button id="tab-btn-rank" onclick="switchTab('rank')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition">
                     📊 AI 퀀트 대시보드
@@ -28,75 +26,30 @@
         </div>
     </header>
 
-    <!-- Pro Macro Market Bar -->
-    <div class="bg-slate-900/80 border-b border-slate-800 text-xs py-2 px-4 overflow-x-auto whitespace-nowrap">
-        <div class="max-w-7xl mx-auto flex items-center justify-between gap-6 text-slate-400">
-            <div class="flex items-center gap-4">
-                <span class="bg-indigo-500/20 text-indigo-400 font-bold px-2 py-0.5 rounded text-[10px]">PRO MACRO</span>
-                <div>시장 상태: <span id="market-status" class="font-bold text-emerald-400">로딩 중...</span></div>
-            </div>
-            <div>알고리즘 적중률(승률): <span class="text-emerald-400 font-bold">56.0%</span> | 손익비: <span class="text-emerald-400 font-bold">2.40</span></div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- TAB 1: AI QUANT DASHBOARD -->
         <div id="view-rank" class="space-y-6">
-            
-            <!-- Top Pick Section -->
             <section class="bg-gradient-to-br from-slate-900 via-slate-900 to-indigo-950/40 p-6 rounded-2xl border border-indigo-500/30 shadow-2xl">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
                     <div class="lg:col-span-2 space-y-3">
-                        <div class="flex items-center gap-2">
-                            <span class="bg-emerald-500 text-slate-950 text-xs font-black px-2.5 py-0.5 rounded-full">TODAY'S AI TOP PICK</span>
-                            <span class="text-slate-400 text-xs">5팩터 다층 알고리즘 검증</span>
-                        </div>
-                        <h2 class="text-3xl font-black tracking-tight" id="top-name">로딩 중...</h2>
-                        <p class="text-emerald-400 text-sm font-semibold">💡 "상승 추세 유지 + 변동성 상단 돌파 & 거래량 수급 유입 포착"</p>
+                        <span class="bg-emerald-500 text-slate-950 text-xs font-black px-2.5 py-0.5 rounded-full">TODAY'S AI TOP PICK</span>
+                        <h2 class="text-3xl font-black tracking-tight" id="top-name">데이터 로딩 중...</h2>
                     </div>
 
                     <div class="bg-slate-900/90 p-5 rounded-xl border border-slate-800 text-center space-y-3">
-                        <div>
-                            <div class="text-xs text-slate-400 font-medium">AI 승률 스코어</div>
-                            <div class="text-5xl font-black text-emerald-400 mt-1" id="top-score">0 <span class="text-sm text-slate-500 font-normal">/ 100점</span></div>
-                        </div>
-                        <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-800 text-xs">
-                            <div class="bg-slate-950 p-2 rounded-lg">
-                                <div class="text-[10px] text-slate-400">진입가</div>
-                                <div class="font-bold text-white mt-0.5" id="top-price">-</div>
-                            </div>
-                            <div class="bg-slate-950 p-2 rounded-lg">
-                                <div class="text-[10px] text-emerald-400">목표가 (+8%)</div>
-                                <div class="font-bold text-emerald-400 mt-0.5" id="top-target">-</div>
-                            </div>
-                            <div class="bg-slate-950 p-2 rounded-lg">
-                                <div class="text-[10px] text-rose-400">손절가 (-5%)</div>
-                                <div class="font-bold text-rose-400 mt-0.5" id="top-stop">-</div>
-                            </div>
-                        </div>
+                        <div class="text-xs text-slate-400 font-medium">AI 승률 스코어</div>
+                        <div class="text-5xl font-black text-emerald-400 mt-1" id="top-score">0 <span class="text-sm text-slate-500 font-normal">/ 100점</span></div>
                     </div>
                 </div>
             </section>
 
-            <!-- Chart & Pro Weight Analysis Section -->
             <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 bg-slate-900 p-4 rounded-2xl border border-slate-800 h-[420px] flex flex-col">
                     <div class="flex justify-between items-center mb-2">
-                        <div class="flex items-center gap-3">
-                            <span class="text-xs font-bold text-slate-300">📊 실시간 차트</span>
-                            <!-- 타임프레임 멀티 셀렉터 (MTS 스타일) -->
-                            <div class="flex items-center bg-slate-950 border border-slate-800 p-0.5 rounded text-[10px] font-bold">
-                                <button onclick="changeTimeframe('1m')" id="tf-1m" class="px-2 py-0.5 rounded text-slate-400 hover:text-white">1분</button>
-                                <button onclick="changeTimeframe('5m')" id="tf-5m" class="px-2 py-0.5 rounded text-slate-400 hover:text-white">5분</button>
-                                <button onclick="changeTimeframe('15m')" id="tf-15m" class="px-2 py-0.5 rounded text-slate-400 hover:text-white">15분</button>
-                                <button onclick="changeTimeframe('1d')" id="tf-1d" class="px-2 py-0.5 rounded bg-indigo-600 text-white">일봉</button>
-                            </div>
-                        </div>
+                        <div class="text-xs font-bold text-slate-300">📊 실시간 주가 캔들 차트</div>
                         <div id="selected-stock-title" class="text-xs font-bold text-indigo-400">종목을 선택하세요</div>
                     </div>
-                    <div class="w-full flex-1 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 p-2 flex items-center justify-center relative">
+                    <div class="w-full flex-1 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 p-2 flex items-center justify-center">
                         <canvas id="stockCanvas" class="w-full h-full"></canvas>
                     </div>
                 </div>
@@ -108,7 +61,7 @@
                     </h3>
                     <div class="space-y-4 pt-2">
                         <div>
-                            <div class="flex justify-between text-slate-400 mb-1">추세 정배열 (EMA/MA) <span id="w-trend">0 / 30점</span></div>
+                            <div class="flex justify-between text-slate-400 mb-1">추세 정배열 <span id="w-trend">0 / 30점</span></div>
                             <div class="bg-slate-800 h-1.5 rounded-full overflow-hidden"><div id="wb-trend" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div></div>
                         </div>
                         <div>
@@ -119,26 +72,12 @@
                             <div class="flex justify-between text-slate-400 mb-1">거래량 수급 유입 <span id="w-volume">0 / 20점</span></div>
                             <div class="bg-slate-800 h-1.5 rounded-full overflow-hidden"><div id="wb-volume" class="bg-sky-500 h-full w-0 transition-all duration-500"></div></div>
                         </div>
-                        <div>
-                            <div class="flex justify-between text-slate-400 mb-1">KOSPI 상승장 지지 <span id="w-market">0 / 15점</span></div>
-                            <div class="bg-slate-800 h-1.5 rounded-full overflow-hidden"><div id="wb-market" class="bg-amber-500 h-full w-0 transition-all duration-500"></div></div>
-                        </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Screening Table with Search & Filter -->
             <section class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                    <h3 class="font-bold text-sm text-slate-200">🔥 실시간 AI 종목 스크리닝 랭킹</h3>
-                    
-                    <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-                        <input id="search-input" oninput="filterSignals()" type="text" placeholder="종목명/코드 검색..." class="bg-slate-950 border border-slate-800 px-3 py-1 rounded text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <button onclick="setFilter('ALL')" id="filter-all" class="px-2.5 py-1 rounded text-xs font-bold bg-indigo-600 text-white">전체</button>
-                        <button onclick="setFilter('BUY')" id="filter-buy" class="px-2.5 py-1 rounded text-xs font-bold bg-slate-800 text-slate-400 hover:text-white">BUY 전용</button>
-                    </div>
-                </div>
-
+                <h3 class="font-bold text-sm text-slate-200">🔥 실시간 AI 종목 스크리닝 랭킹</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs text-slate-300">
                         <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
@@ -146,48 +85,30 @@
                                 <th class="p-3">종목명</th>
                                 <th class="p-3">현재가</th>
                                 <th class="p-3">AI 점수</th>
-                                <th class="p-3">매수 시그널</th>
-                                <th class="p-3">목표가</th>
-                                <th class="p-3">손절가</th>
+                                <th class="p-3">시그널</th>
                             </tr>
                         </thead>
                         <tbody id="table-body" class="divide-y divide-slate-800/60">
-                            <tr><td colspan="6" class="p-4 text-center text-slate-500">데이터를 불러오는 중입니다...</td></tr>
+                            <tr><td colspan="4" class="p-4 text-center text-slate-500">불러오는 중...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </section>
         </div>
 
-        <!-- TAB 2: PORTFOLIO DIAGNOSTICS -->
         <div id="view-pf" class="hidden space-y-6">
             <section class="bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-4">
                 <h2 class="text-base font-bold text-white">📌 내 포트폴리오 종목 등록</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                    <input id="pf-code" type="text" placeholder="종목코드 (예: 005930)" class="bg-slate-950 border border-slate-800 p-2 rounded text-xs text-white focus:outline-none focus:border-indigo-500">
-                    <input id="pf-price" type="number" placeholder="평균 매수가 (원)" class="bg-slate-950 border border-slate-800 p-2 rounded text-xs text-white focus:outline-none focus:border-indigo-500">
-                    <input id="pf-qty" type="number" placeholder="보유 수량 (주)" class="bg-slate-950 border border-slate-800 p-2 rounded text-xs text-white focus:outline-none focus:border-indigo-500">
-                    <button onclick="addPortfolioItem()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-2 rounded text-xs transition">+ 종목 추가</button>
-                </div>
-            </section>
-
-            <section class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <div class="text-xs text-slate-400">총 매수 금액</div>
-                    <div id="pf-total-buy" class="text-xl font-bold text-white mt-1">0 원</div>
-                </div>
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <div class="text-xs text-slate-400">총 평가 금액</div>
-                    <div id="pf-total-eval" class="text-xl font-bold text-white mt-1">0 원</div>
-                </div>
-                <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
-                    <div class="text-xs text-slate-400">총 평가 손익률</div>
-                    <div id="pf-total-rate" class="text-xl font-bold text-emerald-400 mt-1">0.00%</div>
+                    <input id="pf-code" type="text" placeholder="종목코드 (예: 005930)" class="bg-slate-950 border border-slate-800 p-2 rounded text-xs text-white">
+                    <input id="pf-price" type="number" placeholder="평균 매수가 (원)" class="bg-slate-950 border border-slate-800 p-2 rounded text-xs text-white">
+                    <input id="pf-qty" type="number" placeholder="보유 수량 (주)" class="bg-slate-950 border border-slate-800 p-2 rounded text-xs text-white">
+                    <button onclick="addPortfolioItem()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-2 rounded text-xs">+ 종목 추가</button>
                 </div>
             </section>
 
             <section class="bg-slate-900 p-5 rounded-2xl border border-slate-800">
-                <h3 class="font-bold text-sm text-slate-200 mb-4">🩺 AI 퀀트 포트폴리오 진단 결과 리포트</h3>
+                <h3 class="font-bold text-sm text-slate-200 mb-4">🩺 AI 포트폴리오 진단 결과 리포트</h3>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-xs text-slate-300">
                         <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
@@ -196,13 +117,11 @@
                                 <th class="p-3">매수가 / 현재가</th>
                                 <th class="p-3">수량</th>
                                 <th class="p-3">수익률</th>
-                                <th class="p-3">5팩터 점수</th>
                                 <th class="p-3">AI 대응 가이드</th>
-                                <th class="p-3">관리</th>
                             </tr>
                         </thead>
                         <tbody id="pf-table-body" class="divide-y divide-slate-800/60">
-                            <tr><td colspan="7" class="p-4 text-center text-slate-500">등록된 보유 종목이 없습니다. 위에서 추가해 보세요!</td></tr>
+                            <tr><td colspan="5" class="p-4 text-center text-slate-500">등록된 보유 종목이 없습니다.</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -213,50 +132,19 @@
 
     <script>
         var API_SIGNALS = "https://my-quant-ai.onrender.com/api/signals";
-        var API_CHART = "https://my-quant-ai.onrender.com/api/chart-data";
         var API_PF = "https://my-quant-ai.onrender.com/api/analyze-portfolio";
 
         var globalSignals = [];
         var activeStock = null;
-        var currentTimeframe = '1d';
-        var currentFilter = 'ALL';
         var myPortfolio = JSON.parse(localStorage.getItem('my_portfolio') || '[]');
 
         function switchTab(tab) {
             document.getElementById('view-rank').classList.toggle('hidden', tab !== 'rank');
             document.getElementById('view-pf').classList.toggle('hidden', tab !== 'pf');
-            
-            document.getElementById('tab-btn-rank').className = tab === 'rank' 
-                ? "px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition"
-                : "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition";
-
-            document.getElementById('tab-btn-pf').className = tab === 'pf' 
-                ? "px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition"
-                : "px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition";
-
             if (tab === 'pf') analyzePortfolio();
         }
 
-        function changeTimeframe(tf) {
-            currentTimeframe = tf;
-            ['1m', '5m', '15m', '1d'].forEach(function(t) {
-                var btn = document.getElementById('tf-' + t);
-                if (btn) {
-                    btn.className = t === tf ? "px-2 py-0.5 rounded bg-indigo-600 text-white" : "px-2 py-0.5 rounded text-slate-400 hover:text-white";
-                }
-            });
-            if (activeStock) fetchAndRenderChart(activeStock.code, currentTimeframe);
-        }
-
-        function fetchAndRenderChart(code, tf) {
-            fetch(API_CHART + "?code=" + code + "&timeframe=" + tf)
-                .then(function(res) { return res.json(); })
-                .then(function(data) {
-                    drawCanvasChart(data.ohlc);
-                });
-        }
-
-        function drawCanvasChart(ohlc) {
+        function drawCanvasChart(stock) {
             var canvas = document.getElementById('stockCanvas');
             if (!canvas) return;
             var ctx = canvas.getContext('2d');
@@ -269,104 +157,54 @@
 
             ctx.clearRect(0, 0, w, h);
 
-            if (!ohlc || ohlc.length === 0) {
-                ctx.fillStyle = '#64748b';
-                ctx.font = '12px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('차트 데이터 로딩 중...', w / 2, h / 2);
-                return;
-            }
+            if (!stock) return;
 
-            var prices = ohlc.map(function(d) { return d.close; });
-            var minP = Math.min.apply(null, prices) * 0.98;
-            var maxP = Math.max.apply(null, prices) * 1.02;
+            var p = stock.price;
+            var o = stock.open || p;
+            var high = stock.high || p * 1.02;
+            var low = stock.low || p * 0.98;
 
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = 1;
-            for (var i = 1; i <= 4; i++) {
-                var y = (h / 5) * i;
-                ctx.beginPath();
-                ctx.moveTo(0, y);
-                ctx.lineTo(w, y);
-                ctx.stroke();
-            }
-
-            var candleW = (w - 40) / ohlc.length;
-            ctx.beginPath();
-            ctx.strokeStyle = '#10b981';
-            ctx.lineWidth = 2;
-
-            ohlc.forEach(function(d, idx) {
-                var x = 20 + idx * candleW + candleW / 2;
-                var y = h - ((d.close - minP) / (maxP - minP)) * (h - 40) - 20;
-
-                if (idx === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-
-                var openY = h - ((d.open - minP) / (maxP - minP)) * (h - 40) - 20;
-                var isUp = d.close >= d.open;
-                ctx.fillStyle = isUp ? '#ef4444' : '#3b82f6';
-                ctx.fillRect(x - candleW * 0.3, Math.min(y, openY), candleW * 0.6, Math.max(Math.abs(y - openY), 2));
-            });
-
-            ctx.stroke();
-        }
-
-        function updateWeightAnalysis(item) {
-            document.getElementById('weight-stock-name').innerText = item.name;
-            document.getElementById('selected-stock-title').innerText = item.name + " (" + item.code + ")";
+            var isUp = p >= o;
             
-            var trendScore = item.score >= 30 ? 30 : item.score;
-            var volScore = item.score >= 55 ? 25 : (item.score > 30 ? item.score - 30 : 0);
-            var volumeScore = item.score >= 75 ? 20 : (item.score > 55 ? item.score - 55 : 0);
+            // 캔들 그리기
+            ctx.strokeStyle = isUp ? '#ef4444' : '#3b82f6';
+            ctx.fillStyle = isUp ? '#ef4444' : '#3b82f6';
+            ctx.lineWidth = 3;
 
-            document.getElementById('w-trend').innerText = trendScore + " / 30점";
-            document.getElementById('wb-trend').style.width = (trendScore / 30 * 100) + "%";
-            document.getElementById('w-volatility').innerText = volScore + " / 25점";
-            document.getElementById('wb-volatility').style.width = (volScore / 25 * 100) + "%";
-            document.getElementById('w-volume').innerText = volumeScore + " / 20점";
-            document.getElementById('wb-volume').style.width = (volumeScore / 20 * 100) + "%";
+            var centerX = w / 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, h * 0.1);
+            ctx.lineTo(centerX, h * 0.9);
+            ctx.stroke();
+
+            ctx.fillRect(centerX - 40, h * 0.25, 80, h * 0.5);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 14px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText("현재가: " + p.toLocaleString() + "원", centerX, h * 0.2);
         }
 
         function selectStock(code) {
             var item = globalSignals.find(function(s) { return s.code === code; });
             if (!item) return;
             activeStock = item;
-            fetchAndRenderChart(item.code, currentTimeframe);
-            updateWeightAnalysis(item);
-        }
-
-        function setFilter(type) {
-            currentFilter = type;
-            document.getElementById('filter-all').className = type === 'ALL' ? "px-2.5 py-1 rounded text-xs font-bold bg-indigo-600 text-white" : "px-2.5 py-1 rounded text-xs font-bold bg-slate-800 text-slate-400 hover:text-white";
-            document.getElementById('filter-buy').className = type === 'BUY' ? "px-2.5 py-1 rounded text-xs font-bold bg-indigo-600 text-white" : "px-2.5 py-1 rounded text-xs font-bold bg-slate-800 text-slate-400 hover:text-white";
-            filterSignals();
-        }
-
-        function filterSignals() {
-            var query = document.getElementById('search-input').value.toLowerCase();
-            var filtered = globalSignals.filter(function(item) {
-                var matchesQuery = item.name.toLowerCase().includes(query) || item.code.toLowerCase().includes(query);
-                var matchesFilter = (currentFilter === 'ALL') || (item.signal === 'BUY');
-                return matchesQuery && matchesFilter;
-            });
-            renderTable(filtered);
+            drawCanvasChart(item);
+            
+            document.getElementById('weight-stock-name').innerText = item.name;
+            document.getElementById('selected-stock-title').innerText = item.name + " (" + item.code + ")";
+            document.getElementById('w-trend').innerText = (item.score >= 30 ? 30 : item.score) + " / 30점";
+            document.getElementById('wb-trend').style.width = ((item.score >= 30 ? 30 : item.score) / 30 * 100) + "%";
         }
 
         function renderTable(list) {
             var tbody = document.getElementById('table-body');
-            if (list.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-slate-500">검색 결과가 없습니다.</td></tr>';
-                return;
-            }
             tbody.innerHTML = list.map(function(item, idx) {
-                return '<tr onclick="selectStock(\'' + item.code + '\')" class="cursor-pointer transition ' + (idx === 0 ? 'bg-emerald-500/10 font-bold border-l-4 border-emerald-500 hover:bg-emerald-500/20' : 'hover:bg-slate-800/60') + '">' +
-                    '<td class="p-3 text-white flex items-center gap-2"><span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded">' + (idx + 1) + '</span>' + item.name + ' (' + item.code + ')</td>' +
+                return '<tr onclick="selectStock(\'' + item.code + '\')" class="cursor-pointer hover:bg-slate-800/60 transition">' +
+                    '<td class="p-3 text-white font-bold">' + item.name + ' (' + item.code + ')</td>' +
                     '<td class="p-3">' + item.price.toLocaleString() + '원</td>' +
-                    '<td class="p-3 text-emerald-400">' + item.score + '점</td>' +
+                    '<td class="p-3 text-emerald-400 font-bold">' + item.score + '점</td>' +
                     '<td class="p-3"><span class="' + (item.signal === 'BUY' ? 'bg-emerald-500 text-slate-950 font-black' : 'bg-slate-800 text-slate-400') + ' px-2 py-0.5 rounded">' + item.signal + '</span></td>' +
-                    '<td class="p-3 text-emerald-400">' + item.target_price.toLocaleString() + '원</td>' +
-                    '<td class="p-3 text-rose-400">' + item.stop_price.toLocaleString() + '원</td>' +
                 '</tr>';
             }).join('');
         }
@@ -375,60 +213,33 @@
             fetch(API_SIGNALS)
                 .then(function(res) { return res.json(); })
                 .then(function(data) {
-                    if (data.market_bull !== undefined) {
-                        document.getElementById('market-status').innerText = data.market_bull ? "상승장 (Bull Market)" : "하락장 (Caution)";
-                    }
                     globalSignals = data.signals;
                     if(globalSignals && globalSignals.length > 0) {
                         var top = globalSignals[0];
                         activeStock = top;
                         document.getElementById('top-name').innerText = top.name + " (" + top.code + ")";
                         document.getElementById('top-score').innerText = top.score;
-                        document.getElementById('top-price').innerText = top.price.toLocaleString() + "원";
-                        document.getElementById('top-target').innerText = top.target_price.toLocaleString() + "원";
-                        document.getElementById('top-stop').innerText = top.stop_price.toLocaleString() + "원";
                         renderTable(globalSignals);
-                        fetchAndRenderChart(top.code, currentTimeframe);
-                        updateWeightAnalysis(top);
+                        drawCanvasChart(top);
+                        selectStock(top.code);
                     }
                 });
         }
 
-        // PORTFOLIO LOGIC
         function addPortfolioItem() {
             var code = document.getElementById('pf-code').value.trim();
             var price = parseFloat(document.getElementById('pf-price').value);
             var qty = parseInt(document.getElementById('pf-qty').value);
 
-            if (!code || isNaN(price) || isNaN(qty)) {
-                alert("종목코드, 매수가, 수량을 바르게 입력해 주세요!");
-                return;
-            }
+            if (!code || isNaN(price) || isNaN(qty)) return;
 
             myPortfolio.push({ code: code, buy_price: price, quantity: qty });
-            localStorage.setItem('my_portfolio', JSON.stringify(myPortfolio));
-
-            document.getElementById('pf-code').value = '';
-            document.getElementById('pf-price').value = '';
-            document.getElementById('pf-qty').value = '';
-
-            analyzePortfolio();
-        }
-
-        function removePortfolioItem(idx) {
-            myPortfolio.splice(idx, 1);
             localStorage.setItem('my_portfolio', JSON.stringify(myPortfolio));
             analyzePortfolio();
         }
 
         function analyzePortfolio() {
-            if (myPortfolio.length === 0) {
-                document.getElementById('pf-total-buy').innerText = "0 원";
-                document.getElementById('pf-total-eval').innerText = "0 원";
-                document.getElementById('pf-total-rate').innerText = "0.00%";
-                document.getElementById('pf-table-body').innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">등록된 보유 종목이 없습니다. 위에서 추가해 보세요!</td></tr>';
-                return;
-            }
+            if (myPortfolio.length === 0) return;
 
             fetch(API_PF, {
                 method: "POST",
@@ -437,31 +248,18 @@
             })
             .then(function(res) { return res.json(); })
             .then(function(data) {
-                document.getElementById('pf-total-buy').innerText = data.total_buy.toLocaleString() + " 원";
-                document.getElementById('pf-total-eval').innerText = data.total_eval.toLocaleString() + " 원";
-                
-                var rateElem = document.getElementById('pf-total-rate');
-                rateElem.innerText = (data.total_profit_rate >= 0 ? "+" : "") + data.total_profit_rate + "%";
-                rateElem.className = "text-xl font-bold " + (data.total_profit_rate >= 0 ? "text-emerald-400" : "text-rose-400");
-
                 var tbody = document.getElementById('pf-table-body');
-                tbody.innerHTML = data.diagnostics.map(function(item, idx) {
-                    return '<tr class="hover:bg-slate-800/40">' +
+                tbody.innerHTML = data.diagnostics.map(function(item) {
+                    return '<tr>' +
                         '<td class="p-3 font-bold text-white">' + item.code + '</td>' +
-                        '<td class="p-3">' + item.buy_price.toLocaleString() + '원 / <span class="font-bold text-white">' + item.curr_price.toLocaleString() + '원</span></td>' +
+                        '<td class="p-3">' + item.buy_price.toLocaleString() + '원 / ' + item.curr_price.toLocaleString() + '원</td>' +
                         '<td class="p-3">' + item.quantity + '주</td>' +
-                        '<td class="p-3 font-bold ' + (item.profit_rate >= 0 ? 'text-emerald-400' : 'text-rose-400') + '">' + (item.profit_rate >= 0 ? '+' : '') + item.profit_rate + '%</td>' +
-                        '<td class="p-3 text-indigo-400 font-bold">' + item.score + '점</td>' +
-                        '<td class="p-3 text-xs text-amber-400 font-semibold">' + item.action + '</td>' +
-                        '<td class="p-3"><button onclick="removePortfolioItem(' + idx + ')" class="text-xs bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded hover:bg-rose-500/40">삭제</button></td>' +
+                        '<td class="p-3 font-bold ' + (item.profit_rate >= 0 ? 'text-emerald-400' : 'text-rose-400') + '">' + item.profit_rate + '%</td>' +
+                        '<td class="p-3 text-amber-400 font-bold">' + item.action + '</td>' +
                     '</tr>';
                 }).join('');
             });
         }
-
-        window.addEventListener('resize', function() {
-            if (activeStock) fetchAndRenderChart(activeStock.code, currentTimeframe);
-        });
 
         loadSignals();
     </script>
