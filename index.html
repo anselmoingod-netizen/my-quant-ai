@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Quant Hub - 매매 타점 대시보드</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lightweight Charts 오픈소스 라이브러리 -->
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased min-h-screen">
 
@@ -86,10 +84,12 @@
             <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 bg-slate-900 p-4 rounded-2xl border border-slate-800 h-[420px] flex flex-col">
                     <div class="flex justify-between items-center mb-2">
-                        <div class="text-xs font-bold text-slate-300">📊 AI 퀀트 실시간 캔들 차트</div>
+                        <div class="text-xs font-bold text-slate-300">📊 AI 퀀트 실시간 차트 (Canvas 엔진)</div>
                         <div id="selected-stock-title" class="text-xs font-bold text-indigo-400">종목을 선택하세요</div>
                     </div>
-                    <div id="chart_container" class="w-full flex-1 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 relative"></div>
+                    <div class="w-full flex-1 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 p-2 flex items-center justify-center relative">
+                        <canvas id="stockCanvas" class="w-full h-full"></canvas>
+                    </div>
                 </div>
                 
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-3 text-xs h-[420px]">
@@ -210,8 +210,6 @@
         var activeStock = null;
         var currentFilter = 'ALL';
         var myPortfolio = JSON.parse(localStorage.getItem('my_portfolio') || '[]');
-        var chartInstance = null;
-        var candleSeries = null;
 
         function switchTab(tab) {
             document.getElementById('view-rank').classList.toggle('hidden', tab !== 'rank');
@@ -228,52 +226,65 @@
             if (tab === 'pf') analyzePortfolio();
         }
 
-        // Lightweight Charts 캔들스틱 초기화
-        function initChart() {
-            var container = document.getElementById('chart_container');
-            if (!container) return;
-            container.innerHTML = '';
+        // 순수 HTML5 Canvas 차트 렌더링 엔진 (외부 라이브러리 의존성 0%)
+        function drawCanvasChart(stock) {
+            var canvas = document.getElementById('stockCanvas');
+            if (!canvas) return;
+            var ctx = canvas.getContext('2d');
 
-            chartInstance = LightweightCharts.createChart(container, {
-                width: container.clientWidth,
-                height: container.clientHeight,
-                layout: {
-                    backgroundColor: '#020617',
-                    textColor: '#94a3b8',
-                },
-                grid: {
-                    vertLines: { color: '#1e293b' },
-                    horzLines: { color: '#1e293b' },
-                },
-                priceScale: { borderColor: '#334155' },
-                timeScale: { borderColor: '#334155' },
-            });
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
 
-            // 캔들 색상 설정 (한국 주식 스타일: 양봉 빨강, 음봉 파랑)
-            candleSeries = chartInstance.addCandlestickSeries({
-                upColor: '#ef4444',
-                downColor: '#3b82f6',
-                borderUpColor: '#ef4444',
-                borderDownColor: '#3b82f6',
-                wickUpColor: '#ef4444',
-                wickDownColor: '#3b82f6',
-            });
+            var w = canvas.width;
+            var h = canvas.height;
 
-            window.addEventListener('resize', function() {
-                if (chartInstance && container) {
-                    chartInstance.applyOptions({ width: container.clientWidth, height: container.clientHeight });
-                }
-            });
-        }
+            ctx.clearRect(0, 0, w, h);
 
-        function renderCandleChart(stock) {
-            if (!stock) return;
-            if (!chartInstance) initChart();
-
-            if (stock.ohlc && stock.ohlc.length > 0) {
-                candleSeries.setData(stock.ohlc);
-                chartInstance.timeScale().fitContent();
+            if (!stock || !stock.ohlc || stock.ohlc.length === 0) {
+                ctx.fillStyle = '#64748b';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('차트 데이터가 없습니다.', w / 2, h / 2);
+                return;
             }
+
+            var data = stock.ohlc;
+            var prices = data.map(function(d) { return d.close; });
+            var minP = Math.min.apply(null, prices) * 0.98;
+            var maxP = Math.max.apply(null, prices) * 1.02;
+
+            // 격자선 연출
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 1;
+            for (var i = 1; i <= 4; i++) {
+                var y = (h / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(w, y);
+                ctx.stroke();
+            }
+
+            // 캔들 및 가격 선 그리기
+            var candleW = (w - 40) / data.length;
+            ctx.beginPath();
+            ctx.strokeStyle = '#10b981';
+            ctx.lineWidth = 2;
+
+            data.forEach(function(d, idx) {
+                var x = 20 + idx * candleW + candleW / 2;
+                var y = h - ((d.close - minP) / (maxP - minP)) * (h - 40) - 20;
+
+                if (idx === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+
+                // 양봉/음봉 캔들 그리기
+                var openY = h - ((d.open - minP) / (maxP - minP)) * (h - 40) - 20;
+                var isUp = d.close >= d.open;
+                ctx.fillStyle = isUp ? '#ef4444' : '#3b82f6';
+                ctx.fillRect(x - candleW * 0.3, Math.min(y, openY), candleW * 0.6, Math.max(Math.abs(y - openY), 2));
+            });
+
+            ctx.stroke();
         }
 
         function updateWeightAnalysis(item) {
@@ -296,7 +307,7 @@
             var item = globalSignals.find(function(s) { return s.code === code; });
             if (!item) return;
             activeStock = item;
-            renderCandleChart(item);
+            drawCanvasChart(item);
             updateWeightAnalysis(item);
         }
 
@@ -352,8 +363,7 @@
                         document.getElementById('top-target').innerText = top.target_price.toLocaleString() + "원";
                         document.getElementById('top-stop').innerText = top.stop_price.toLocaleString() + "원";
                         renderTable(globalSignals);
-                        initChart();
-                        renderCandleChart(top);
+                        drawCanvasChart(top);
                         updateWeightAnalysis(top);
                     }
                 });
@@ -423,6 +433,10 @@
                 }).join('');
             });
         }
+
+        window.addEventListener('resize', function() {
+            if (activeStock) drawCanvasChart(activeStock);
+        });
 
         loadSignals();
     </script>
