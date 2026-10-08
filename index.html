@@ -55,7 +55,7 @@
                         로딩 중...
                     </h2>
                     <p class="text-emerald-400 text-sm font-semibold">
-                        💡 "상승 추세 유지 + 변동성 상단 돌파 & 거래량 수급 유입 포착"
+                        💡 "상승 추세 유지 + 변동성 상단 돌파 & 거래량 수수급 유입 포착"
                     </p>
                 </div>
 
@@ -170,7 +170,7 @@
                     setTimeout(function() {
                         renderTradingViewChart(activeStock.code);
                         updateWeightAnalysis(activeStock);
-                    }, 150);
+                    }, 200);
                 }
             } else {
                 btnSimple.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 text-white transition";
@@ -182,7 +182,7 @@
 
         function renderTradingViewChart(code) {
             if (!code) return;
-            var cleanCode = code.replace('.KS', '');
+            var cleanCode = code.replace('.KS', '').replace('KRX:', '');
             var container = document.getElementById('tradingview_chart');
             container.innerHTML = ''; 
 
@@ -195,6 +195,9 @@
                     "theme": "dark",
                     "style": "1",
                     "locale": "kr",
+                    "toolbar_bg": "#f1f3f6",
+                    "enable_publishing": false,
+                    "allow_symbol_change": true,
                     "container_id": "tradingview_chart"
                 });
             }
@@ -273,7 +276,6 @@
                 });
         }
 
-        // 스크립트 도달 즉시 실행
         loadSignals();
     </script>
 </body>
